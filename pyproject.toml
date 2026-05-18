@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gwas-postgwas-tools"
-version = "0.1.0"
+version = "0.1.1"
 description = "Installable Python package for real-data post-GWAS preprocessing and analysis workflows."
 readme = "README.md"
 requires-python = ">=3.9"
