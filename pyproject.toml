@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gwas-postgwas-tools"
+version = "0.1.0"
+description = "Installable Python package for real-data post-GWAS preprocessing and analysis workflows."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "May" }
+]
+dependencies = [
+  "pandas>=2.0",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+gwas-postgwas = "gwas_postgwas_tools.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gwas_postgwas_tools*"]
+
+[tool.setuptools.package-data]
+"gwas_postgwas_tools" = ["r/*.R"]

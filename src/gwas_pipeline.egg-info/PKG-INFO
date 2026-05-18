@@ -1,0 +1,123 @@
+Metadata-Version: 2.4
+Name: gwas-pipeline
+Version: 0.3.0
+Summary: Installable Python package for end-to-end GWAS tutorial workflows.
+Author: May
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: matplotlib>=3.8
+Requires-Dist: networkx>=3.0
+Requires-Dist: numpy>=1.24
+Requires-Dist: pandas>=2.0
+Requires-Dist: pyyaml>=6.0
+
+# gwas-pipeline
+
+Python package for packaging the full GWAS tutorial workflow behind a
+consistent CLI and reusable step modules.
+
+It installs a pure GWAS package with packaged `step1` through `step9`
+modules, while keeping the legacy standalone step scripts as thin
+compatibility wrappers.
+
+## Scope of the first version
+
+This scaffold focuses on the minimum post-GWAS path:
+
+- summary statistics loading
+- configurable source-to-standard column mapping
+- variant harmonization
+- colocalization wrapper boundary
+- Mendelian randomization wrapper boundary
+- batch workflow orchestration by gene and cell type
+
+The package is designed to keep analysis logic in Python while calling
+specialized external tools from adapters when needed.
+
+## R dependencies
+
+The real colocalization and MR wrappers expect:
+
+- `Rscript` available on `PATH`
+- R package `coloc`
+- R package `MendelianRandomization`
+
+## Install
+
+```bash
+pip install -e .
+```
+
+## GWAS tutorial CLI
+
+After `pip install -e .`, you can run the packaged step modules through either
+entrypoint:
+
+```bash
+gwas-pipeline step3 --gwas /path/to/results.tsv --gff /path/to/genes.gff --output-dir /tmp/step3
+python -m gwas_pipeline step8 --vcf /path/to/region.vcf.gz --region 22:1-100000 --class-file class.csv --output-dir /tmp/step8
+gwas-pipeline doctor --profile plink_env
+```
+
+The original `gwas_step*_project/*.py` files remain available and now forward
+to the packaged modules in `src/gwas_pipeline/steps/`.
+
+## Runnable GWAS template
+
+There is also a pure-Python GWAS teaching template that runs without
+`plink`, `numpy`, or `pandas`. It is intended for learning the workflow and
+for adapting to small tabular datasets before swapping in external tools for
+real production-scale GWAS.
+
+Run the bundled demo:
+
+```bash
+python3 scripts/run_simple_gwas_template.py \
+  --config examples/simple_gwas_template/config.json
+```
+
+The template writes:
+
+- `gwas_results.tsv`
+- `candidate_hits.tsv`
+- `summary.txt`
+- `manhattan.svg`
+- `qq_plot.svg`
+
+
+## Real-data preprocessing
+
+For split cell-type eQTL files similar to the Bryois-style layout, first build
+standardized tables:
+
+```bash
+python scripts/build_standardized_eqtl.py \
+  --eqtl-root /home/y413109/project/eqtl \
+  --snp-map /home/y413109/project/eqtl/snp_pos.txt \
+  --output /home/y413109/project/eqtl/standardized/brain_eqtl_standardized.tsv.gz
+
+python scripts/build_standardized_gwas.py \
+  --gwas /home/y413109/project/eqtl/gwas/summary_stats_AD_mapped \
+  --output /home/y413109/project/eqtl/standardized/ad_gwas_standardized.tsv.gz
+```
+
+Then point `examples/run_real_postgwas.yaml` at those standardized outputs.
+
+## Real input expectations
+
+The package standardizes input columns into this internal schema:
+
+- `chrom`
+- `position`
+- `effect_allele`
+- `other_allele`
+- `beta`
+- `se`
+- `p_value`
+- `gene_id` for eQTL only
+- `cell_type` for eQTL only
+- `maf` optional today, reserved for future coloc improvements
+
+Use `inputs.eqtl.columns` and `inputs.gwas.columns` in YAML to map your
+real source column names onto those standard names.

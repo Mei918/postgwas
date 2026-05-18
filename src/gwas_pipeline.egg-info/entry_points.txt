@@ -1,0 +1,2 @@
+[console_scripts]
+gwas-pipeline = gwas_pipeline.cli:main

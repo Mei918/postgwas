@@ -1,0 +1,57 @@
+study:
+  name: ad_ebv_demo
+
+reference:
+  genome_build: GRCh38
+
+inputs:
+  eqtl:
+    path: examples/demo_eqtl.tsv
+    sep: "\t"
+    columns:
+      chrom: chrom
+      position: position
+      effect_allele: effect_allele
+      other_allele: other_allele
+      beta: beta
+      se: se
+      p_value: p_value
+      gene_id: gene_id
+      cell_type: cell_type
+  gwas:
+    path: examples/demo_gwas.tsv
+    sep: "\t"
+    columns:
+      chrom: chrom
+      position: position
+      effect_allele: effect_allele
+      other_allele: other_allele
+      beta: beta
+      se: se
+      p_value: p_value
+  output_dir: examples/output
+
+runtime:
+  rscript_executable: Rscript
+
+batch:
+  mode: gene_cell_type
+  write_group_harmonized: true
+  chunk_size: 200000
+  progress_every: 10
+
+postgwas:
+  eqtl_trait_type: quant
+  gwas_trait_type: cc
+  eqtl_sd_y: 1.0
+  eqtl_sample_size: 500
+  gwas_sample_size: 10000
+  gwas_case_prop: 0.35
+  coloc:
+    min_overlap_snps: 2
+    pp4_threshold: 0.8
+    p1: 1.0e-4
+    p2: 1.0e-4
+    p12: 1.0e-5
+  mr:
+    method: wald_ratio
